@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
         required: [true,"Please provide a gender"]
     },
     interests: {
-        type: String,
+        type: Array,
         required: [true,"Please provide a interests"]
     },
     email: {

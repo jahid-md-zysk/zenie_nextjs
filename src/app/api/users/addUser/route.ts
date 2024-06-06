@@ -21,12 +21,12 @@ export async function POST(request:NextRequest){
         if (user){
             return NextResponse.json({error:"User already exists"},{status:400});
         }
-
+        console.log(interests)
         const newUser = new User({
             username : name,
             email,
             gender,
-            interests:JSON.stringify(interests),
+            interests:interests,
             address:JSON.stringify(address),
             comment: userComment,
         })

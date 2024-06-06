@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import Dropdown from './Dropdown';
+import { Input } from "@/components/ui/input"
 
 interface FormValues {
   name: string;
@@ -52,7 +53,7 @@ const MyForm: React.FC = () => {
     interests: Yup.array().min(1, 'At least one interest must be selected').required('At least one interest must be selected'),
     userComment: Yup.string().required('Comment is required'),
   });
-
+  
   useEffect(() => {
     fetch('/api/states')
       .then((res) => {
@@ -90,18 +91,22 @@ const MyForm: React.FC = () => {
       setSubmitting(false);
     }
   };
-  
+  //                      
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={onSubmit}
     >
-      {({ isSubmitting }) => (
+      {({ isSubmitting, values, handleChange, handleBlur}) => (
         <Form className='w-1/3 p-4 border rounded shadow-md'>
           <div className="mb-4" >
             <label className='block text-sm font-medium text-gray-700' htmlFor="name">Name</label>
-            <Field type="text" name="name" className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+            <Input type="text" value={values.name} onChange={handleChange} onBlur={handleBlur} name="name" placeholder="Name" />
+            {/* <input type="text" name="name" value={name} placeholder="Name" />
+             */}
+             {/* <input type="text" value={values.name} onChange={handleChange} onBlur={handleBlur} name="name" placeholder="Name" /> */}
+            {/* <Field type="text" name="name" className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" /> */}
             <ErrorMessage name="name" component="div" className="text-red-500 text-sm mt-1" />
           </div>
           <div className="mb-4" >
@@ -110,8 +115,8 @@ const MyForm: React.FC = () => {
             <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
           </div>
           {/* <div className="mb-4" >
-            <label className='block text-sm font-medium text-gray-700' htmlFor="email">Email</label>
-            <Field type="email" name="email" className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+            <label className='block text-sm font-medium text-700' htmlFor="email">Email</label>
+            <Field type="email" name="email" className="text-black mt-1 w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
             <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
           </div> */}
           <div className="mb-4">
