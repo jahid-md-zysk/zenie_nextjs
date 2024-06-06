@@ -28,7 +28,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   if (!isMounted) {
     return null;
   }
-// 
+
   return (
     <Select
       {...field}

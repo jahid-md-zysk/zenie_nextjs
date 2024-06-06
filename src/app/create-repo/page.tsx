@@ -1,5 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import Modal from '@/app/components/Modal';
+import FormikTable from '@/app/components/FormikTable';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import Dropdown from '@/app/components/Dropdown';
@@ -55,7 +57,21 @@ const templateOwners = [
 ];
 
 const CreateRepo: React.FC = () => {
-	const [states, setStates] = useState([]);
+	const [isModalOpen, setModalOpen] = useState(false);
+
+	const openModal = () => {
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		debugger
+		setModalOpen(false);
+	};
+	const handleTableSubmit = ()=>{
+		// event.preventDefault()
+		closeModal()
+		console.log('handleTableSubmit')
+	}
 	const [isDropdownSelected, setIsDropdownSelected] = useState<boolean>(false);
 	const initialValues: FormValues = {
 		repo_name: '',
@@ -94,6 +110,7 @@ const CreateRepo: React.FC = () => {
 		{ setSubmitting, resetForm }: FormikHelpers<FormValues>
 	) => {
 		console.log(values);
+		console.log("-------------")
 		handleOptionChange('');
 		try {
 			// const response = await fetch('/api/users/addUser', {
@@ -189,6 +206,17 @@ const CreateRepo: React.FC = () => {
 						/>
 						<ErrorMessage name="collabarators" component="div" />
 					</div>
+					<div className="mb-4">
+						<button
+							onClick={openModal}
+							className="bg-blue-500 text-white px-4 py-2 rounded"
+						>
+							Permissions
+						</button>
+						{/* <Modal isOpen={isModalOpen} onClose={closeModal} title="User Permissions"> */}
+							<FormikTable  initialValues={users} onSubmit={handleTableSubmit}/>
+						{/* </Modal> */}
+                    </div>
 					<div className="mb-4">
 						<button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
 						Submit
