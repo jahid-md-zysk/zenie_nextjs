@@ -10,6 +10,7 @@ interface Option {
 
 interface MultiSelectProps extends FieldProps {
   options: OptionsType<Option>;
+  
 }
 
 const MultiSelect: React.FC<MultiSelectProps> = ({
@@ -23,6 +24,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   }, []);
   const onChange = (option: ValueType<Option, true>) => {
     form.setFieldValue(field.name, option);
+    // if(props.onChange) props.onChange()
   };
 
   if (!isMounted) {

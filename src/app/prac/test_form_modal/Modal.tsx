@@ -16,18 +16,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
       <div className="bg-white rounded-lg shadow-lg w-1/3">
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-xl font-semibold">{title}</h2>
+          <button onClick={onClose} className="text-black hover:text-red-500">
+            X
+          </button>
         </div>
         <div className="p-4">
           {children}
-        </div>
-        <div className='p-4'>
-        <button
-            type="button"
-            className="mt-2 bg-indigo-600 text-white px-4 py-2 rounded"
-            onClick={onClose}
-          >
-            Proceed
-          </button>
         </div>
       </div>
     </div>
