@@ -3,10 +3,11 @@ import React from 'react';
 import { Field, FieldArray, useFormikContext, ErrorMessage } from 'formik';
 
 interface User {
-  read: boolean;
-  write: boolean;
   pull: boolean;
   push: boolean;
+  admin: boolean;
+  maintain: boolean;
+  triage: boolean;
 }
 
 interface Collaborator {
@@ -33,34 +34,20 @@ const FormikTableField: React.FC<FormikTableFieldProps> = ({ fieldName, onClose 
             <thead className="bg-gray-200">
               <tr>
                 <th className="py-2 px-4 border-b">Name</th>
-                <th className="py-2 px-4 border-b">Read</th>
-                <th className="py-2 px-4 border-b">Write</th>
                 <th className="py-2 px-4 border-b">Pull</th>
                 <th className="py-2 px-4 border-b">Push</th>
-                <th className="py-2 px-4 border-b">Actions</th>
+                <th className="py-2 px-4 border-b">Admin</th>
+                <th className="py-2 px-4 border-b">Maintain</th>
+                <th className="py-2 px-4 border-b">Triage</th>
+                {/* <th className="py-2 px-4 border-b">Actions</th> */}
               </tr>
             </thead>
             <tbody>
-              {console.log(collaborators)}
               {collaborators.map((collaborator, index) => (
                 <tr key={index}>
                   <td className="py-2 px-4 border-b">
                     <span>{collaborator.label}</span>
                     <ErrorMessage name={`collaborators.${index}.label`} component="div" className="text-red-500 text-sm" />
-                  </td>
-                  <td className="py-2 px-4 border-b text-center">
-                    <Field
-                      type="checkbox"
-                      name={`${fieldName}.${index}.read`}
-                      className="form-checkbox h-5 w-5 text-blue-600"
-                    />
-                  </td>
-                  <td className="py-2 px-4 border-b text-center">
-                    <Field
-                      type="checkbox"
-                      name={`${fieldName}.${index}.write`}
-                      className="form-checkbox h-5 w-5 text-blue-600"
-                    />
                   </td>
                   <td className="py-2 px-4 border-b text-center">
                     <Field
@@ -77,6 +64,27 @@ const FormikTableField: React.FC<FormikTableFieldProps> = ({ fieldName, onClose 
                     />
                   </td>
                   <td className="py-2 px-4 border-b text-center">
+                    <Field
+                      type="checkbox"
+                      name={`${fieldName}.${index}.admin`}
+                      className="form-checkbox h-5 w-5 text-blue-600"
+                    />
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    <Field
+                      type="checkbox"
+                      name={`${fieldName}.${index}.maintain`}
+                      className="form-checkbox h-5 w-5 text-blue-600"
+                    />
+                  </td>
+                  <td className="py-2 px-4 border-b text-center">
+                    <Field
+                      type="checkbox"
+                      name={`${fieldName}.${index}.triage`}
+                      className="form-checkbox h-5 w-5 text-blue-600"
+                    />
+                  </td>
+                  {/* <td className="py-2 px-4 border-b text-center">
                     <button
                       type="button"
                       className="bg-red-500 text-white px-2 py-1 rounded"
@@ -90,7 +98,7 @@ const FormikTableField: React.FC<FormikTableFieldProps> = ({ fieldName, onClose 
                     >
                       X
                     </button>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

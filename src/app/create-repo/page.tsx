@@ -2,11 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '@/app/components/Modal';
 import FormikTableField from '@/app/components/FormikTable';
-import { Formik, Form, Field, FieldArray, ErrorMessage, FormikHelpers } from 'formik';
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import Dropdown from '@/app/components/Dropdown';
 import MultiSelectDropdown from '@/app/components/MultiSelect';
-import { permission } from 'process';
 
 export interface FormValues {
 	repo_name: string;
@@ -16,42 +15,73 @@ export interface FormValues {
 	collabarators: Array<Option>;
 	default_branches: boolean;
 	protection: boolean;
-   userpermissions:UserPermission[];
+	userpermissions:UserPermission[];
 }
-// ffffff
+
 interface UserPermission {
-  username: string;
-  read: boolean;
-  write: boolean;
-  pull: boolean;
-  push: boolean;
+	username: string;
+	pull: boolean;
+	push: boolean;
+	admin: boolean;
+	maintain: boolean;
+	triage: boolean;
 }
 interface Option {
 	value: string;
 	label: string;
 }
 
-const users: Option[] = [
-	{ value: '1', label: 'Abdullah' },
-	{ value: '2', label: 'John' },
-	{ value: '3', label: 'Ravi' },
-];
-
-const templateRepos = [
-	{ value: 'template_1', label: 'Template 1' },
-	{ value: 'template_2', label: 'Template 2' },
-	{ value: 'template_3', label: 'Template 3' },
-	{ value: 'template_4', label: 'Template 4' },
-];
-
-const templateOwners = [
-	{ value: 'owner_1', label: 'Owner 1' },
-	{ value: 'owner_2', label: 'Owner 2' },
-	{ value: 'owner_3', label: 'Owner 3' },
-	{ value: 'owner_4', label: 'Owner 4' },
-];
-
 const CreateRepo: React.FC = () => {
+	const [repoOwners, setRepoOwners] = useState([]);
+	const [templateRepos, setTemplateRepos] = useState([])
+	const [users,setUsers] = useState([])
+	useEffect(() => {
+		const fetchTemplateRepos = async () => {
+			const res = await fetch('/api/v1/getTemplateRepos');
+			const result = await res.json();
+			console.log(result);
+			const templateReposData = result.data.map((repo:any) =>{ 
+				return {
+					...repo,
+					value: repo.repo_id,
+					label: repo.repo_name,
+				}
+			})
+			setTemplateRepos(templateReposData);
+		};
+
+		const fetchOwners = async () => {
+			const res = await fetch('/api/v1/owners');
+			const result = await res.json();
+			console.log(result);
+			const owners = result.data.map((owner:any) =>{ 
+				return {
+					...owner,
+					value: owner.owner_id,
+					label: owner.owner_name,
+				}
+			})
+			setRepoOwners(owners);
+		};
+
+		const fetchUsers = async () => {
+			const res = await fetch('/api/v1/collaborators');
+			const result = await res.json();
+			console.log(result);
+			const users = result.data.map((user:any) =>{ 
+				return {
+					...user,
+					value: user.collaborator_id,
+					label: user.collaborator_name,
+				}
+			})
+			setUsers(users);
+		};
+		fetchUsers()
+		fetchOwners();
+		fetchTemplateRepos();
+	}, []);
+
 	const [isModalOpen, setModalOpen] = useState(false);
 
 	const openModal = () => {
@@ -93,12 +123,13 @@ const CreateRepo: React.FC = () => {
 		userpermissions: Yup.array().of(
 			Yup.object().shape({
 				username: Yup.string(),
-				read: Yup.boolean(),
-				write: Yup.boolean(),
 				pull: Yup.boolean(),
 				push: Yup.boolean(),
+				admin: Yup.boolean(),
+				maintain: Yup.boolean(),
+				triage: Yup.boolean()
 			})
-		  ),
+		),
 	});
 
 	const handleMDropdownChange = (selectedOptions: any, setFieldValue: any, values: any) => {
@@ -108,10 +139,11 @@ const CreateRepo: React.FC = () => {
 			const existingPermission = existingPermissions.find((permission: any) => permission.username === option.label);
 				return existingPermission || {
 				username: option.label,
-				read: false,
-				write: false,
 				pull: false,
 				push: false,
+				admin: false,
+				maintain: false,
+				triage: false
 			};
 		});
 		setFieldValue('userpermissions', newPermissions);
@@ -123,39 +155,34 @@ const CreateRepo: React.FC = () => {
 
 
 	const createPayload = (values:FormValues) => {
-		const users = values.userpermissions.map((userpermission => {
+		const users = values.userpermissions.map((userpermission:any )=> {
 			return ({
-                username: userpermission.username,
-                permissions: {
-					read: userpermission.read,
-					write: userpermission.write,
-					pull: userpermission.pull,
-					push: userpermission.push,
-				}
-            })
-		}))
+				username: userpermission.username,
+				permissions: Object.keys(userpermission).filter(key => userpermission[key] === true),
+			})
+		})
 		const payload = {
 			users : users,
 			repo_name : values.repo_name,
 			repo_desc : values.repo_desc,
 			repo_owner : values.repo_owner,
-            template_repo : values.template_repo,
-            default_branches : values.default_branches,
-            protection : values.protection,
+			template_repo : values.template_repo,
+			default_branches : values.default_branches,
+			protection : values.protection,
 		}
 
 		return payload
 	}
 	const onSubmit = async (
-		values: FormValues,
-		{ setSubmitting, resetForm }: FormikHelpers<FormValues>
+			values: FormValues,
+			{ setSubmitting, resetForm }: FormikHelpers<FormValues>
 	) => {
-		// console.log(values);
 		const payload = createPayload(values)
+		console.log(JSON.stringify(payload));
 		console.log(payload);
-		// handleOptionChange('');
 		try {
 			resetForm();
+			handleOptionChange('')
 		} catch (error) {
 			console.error('Error submitting the form', error);
 		} finally {
@@ -186,7 +213,7 @@ const CreateRepo: React.FC = () => {
 					</div>
 					<div className="mb-4">
 						<label htmlFor="repo_owner" className="block text-sm font-medium text-gray-700">Repo Owner</label>
-						<Field  component={Dropdown} options={templateOwners} placeholder="Select a State" name="repo_owner" className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+						<Field  component={Dropdown} options={repoOwners} placeholder="Select Owner" name="repo_owner" className="text-black mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
 						</Field>
 						<ErrorMessage name="repo_owner" component="div" className="text-red-500 text-sm mt-1" />
 					</div>
@@ -197,10 +224,9 @@ const CreateRepo: React.FC = () => {
 						<Field
 							component={Dropdown}
 							options={templateRepos}
-							placeholder="Select a Repo"
+							placeholder="Select Repo"
 							name="template_repo"
 							onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
-								console.log("ffine")
 								const value = event.target.value;
 								handleOptionChange(value);
 								setFieldValue('template_repo', value);
@@ -212,7 +238,7 @@ const CreateRepo: React.FC = () => {
 					{!isDropdownSelected && (
 						<>
 						<div className="mb-4">
-							<label className="block text-gray-700">
+							<label className='block text-sm font-medium text-gray-700'>
 							<Field type="checkbox" name="default_branches"  className="mr-2" />
 							Include Default Branches
 							</label>
@@ -220,7 +246,7 @@ const CreateRepo: React.FC = () => {
 						</div>
 
 						<div className="mb-4">
-							<label className="block text-gray-700">
+							<label className='block text-sm font-medium text-gray-700'>
 							<Field type="checkbox" name="protection" className="mr-2" />
 								Include Protection
 							</label>
@@ -229,7 +255,7 @@ const CreateRepo: React.FC = () => {
 						</>
 					)}
 					<div className="mb-4">
-						<label htmlFor="collabarators">Select Users</label>
+						<label htmlFor="collabarators" className="block text-sm font-medium text-gray-700">Select Users</label>
 						<Field
 							name="collabarators"
 							component={MultiSelectDropdown}
@@ -250,9 +276,9 @@ const CreateRepo: React.FC = () => {
 						<Modal isOpen={isModalOpen} onClose={closeModal} title="User Permissions">
 							<FormikTableField fieldName="userpermissions" onClose={() => console.log('Proceed clicked')} />
 						</Modal>
-                    </div>
+					</div>
 					<div className="mb-4">
-						<button type="submit" onClick={()=>{console.log(values)}} disabled={isSubmitting} className="w-full bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+						<button type="submit" disabled={isSubmitting} className="w-full bg-indigo-600 text-white p-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
 						Submit
 						</button>
 					</div>
