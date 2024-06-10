@@ -50,8 +50,8 @@ const GenericTable: React.FC<GenericTableProps> = ({ columns, data, isAdmin,acti
               {isAdmin && (
                 <TableCell>
                 {actions.map((action, index) => (
-                <span className='px-1'>
-                  <Button className={action.bg_color} key={index} onClick={() => action.onClick(row)}>
+                <span className='px-1' key={index} >
+                  <Button className={action.bg_color} onClick={() => action.onClick(row)}>
                     {action.label}
                   </Button>
                 </span>
@@ -65,7 +65,5 @@ const GenericTable: React.FC<GenericTableProps> = ({ columns, data, isAdmin,acti
     </div>
   );
 };
-
-// {zszasd}
 
 export default GenericTable;
