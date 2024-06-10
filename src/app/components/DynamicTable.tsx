@@ -1,8 +1,9 @@
 // components/GenericTable.tsx
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableHeader, TableRow, TableCell, TableBody, TableHead } from "@/components/ui/table"; // Adjust the import based on the actual shadcn/ui library structure
 import { Button } from "@/components/ui/button";
+import Swal from 'sweetalert2';
 
 export interface RowData {
   [key: string]: string | number;
@@ -28,6 +29,35 @@ interface GenericTableProps {
 }
 
 const GenericTable: React.FC<GenericTableProps> = ({ columns, data, isAdmin,actions }) => {
+  const [selectedRow, setSelectedRow] = useState<RowData | null>(null);
+
+  const handleActionClick = async (action: Action, row: RowData) => {
+    setSelectedRow(row);
+
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, do it!',
+      cancelButtonText: 'No, cancel!',
+    });
+
+    if (result.isConfirmed) {
+      action.onClick(row);
+      Swal.fire(
+        'Confirmed!',
+        'Your action has been confirmed.',
+        'success'
+      );
+    } else {
+      Swal.fire(
+        'Cancelled',
+        'Your action has been cancelled.',
+        'error'
+      );
+    }
+  };
   return (
     <div>
       <Table>
@@ -51,7 +81,7 @@ const GenericTable: React.FC<GenericTableProps> = ({ columns, data, isAdmin,acti
                 <TableCell>
                 {actions.map((action, index) => (
                 <span className='px-1' key={index} >
-                  <Button className={action.bg_color} onClick={() => action.onClick(row)}>
+                  <Button className={action.bg_color} onClick={() => handleActionClick(action, row)}>
                     {action.label}
                   </Button>
                 </span>

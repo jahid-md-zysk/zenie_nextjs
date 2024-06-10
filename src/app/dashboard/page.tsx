@@ -1,10 +1,7 @@
 "use client";
 import React, { useEffect,useState} from 'react';
-import {DataTable}  from "@/app/components/DataTable"
-import { ColumnDef } from "@tanstack/react-table"
-import DynamicTable from '../components/DynamicTable';
 import GenericTable, {RowData,Column, Action} from '../components/DynamicTable';
-
+import {postData} from '@/utils/api'
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export type Requests = {
@@ -15,6 +12,7 @@ export type Requests = {
 
 
 export default function DemoPage() {
+  const [requests, setRequests] = useState<RowData[]>([])
   const [columns, setColumns] = useState<Column[]>([
     { 
       key: 'id', 
@@ -32,39 +30,40 @@ export default function DemoPage() {
       widthClass: 'w-1/3' 
     },
   ]);
+  useEffect(() => {
 
-  const [data, setData] = useState<RowData[]>([
-    {
-      "id": 1,
-      "request": "Request access to project repository",
-      "description": "I need access to the project repository in order to contribute to the development effort. I have experience with similar projects and am familiar with the version control system being used."
-    },
-    {
-      "id": 2,
-      "request": "Grant access to repository for team member",
-      "description": "One of our team members requires access to the project repository to assist with debugging and testing. They are a trusted member of the team and need access to fulfill their responsibilities effectively."
-    },
-    {
-      "id": 3,
-      "request": "Merge branches feature/login and develop",
-      "description": "This request merges changes from the feature/login branch into the develop branch."
-    },
-    {
-      "id": 4,
-      "request": "Fix bug in user authentication module",
-      "description": "This request addresses a critical bug in the user authentication module that causes login failures for some users."
-    }
-  ]);
+    const fetchOwners = async () => {
+			const res = await fetch('/api/v1/requests/getRequests');
+			const result = await res.json();
+			console.log(result);
+			const requests = result.data.map((request:any) =>{ 
+				return {
+					...request
+          // any logic or changes need
+				}
+			})
+			setRequests(requests);
+		};
+
+    fetchOwners()
+  },[])
 
   const isAdmin = true;
-
+  const updateRequestStatus = async(row: RowData)=>{
+    const postUrl = 'api/v1/requests/updateRequestStatus'
+    const response = await postData(postUrl, row);
+    console.log(response)
+  }
   const handleAccept = (row:RowData) => {
-    alert(`Accept clicked on row id ${row.id}`);
+    console.log(`Accept clicked on row id ${row.id}`);
+    updateRequestStatus(row)
   };
 
   const handleReject = (row:RowData) => {
-    alert(`Reject clicked on row id ${row.id}`);
+    console.log(`Reject clicked on row id ${row.id}`);
+    updateRequestStatus(row)
   };
+
   const actions: Action[] = [
     { label: 'Accept', 
       onClick: handleAccept,
@@ -81,7 +80,7 @@ export default function DemoPage() {
       {/* <DataTable columns={columns} data={users}/> */}
       <GenericTable
         columns={columns}
-        data={data}
+        data={requests}
         isAdmin={isAdmin}
         actions={actions}
       />
