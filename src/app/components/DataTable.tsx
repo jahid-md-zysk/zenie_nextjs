@@ -1,5 +1,4 @@
-"use client"
-
+"use client";
 import {
   ColumnDef,
   flexRender,
@@ -37,8 +36,10 @@ export function DataTable<TData, TValue>({
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
+            
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                {console.log(headerGroup)}
                 return (
                   <TableHead key={header.id}>
                     {header.isPlaceholder
@@ -60,11 +61,15 @@ export function DataTable<TData, TValue>({
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
               >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+                {
+                row.getVisibleCells().map((cell) =>{
+                  console.log(cell.column.columnDef.cell,cell.getContext())
+                  return (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  )
+                } )}
               </TableRow>
             ))
           ) : (
@@ -77,5 +82,6 @@ export function DataTable<TData, TValue>({
         </TableBody>
       </Table>
     </div>
+
   )
 }
