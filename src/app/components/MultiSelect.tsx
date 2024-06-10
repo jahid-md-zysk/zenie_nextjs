@@ -19,6 +19,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({ options, valu
   const handleChange = (selectedOptions: Option[]) => {
     form.setFieldValue(field.name, selectedOptions);
     onChange(selectedOptions);
+    console.log(form)
   };
 
   return (
@@ -29,6 +30,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({ options, valu
       onChange={handleChange}
       className="basic-multi-select"
       classNamePrefix="select"
+      instanceId="react-select-instance"
     />
   );
 };
