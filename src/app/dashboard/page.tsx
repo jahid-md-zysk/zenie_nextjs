@@ -67,11 +67,11 @@ export default function DemoPage() {
   const actions: Action[] = [
     { label: 'Accept', 
       onClick: handleAccept,
-      bg_color:"bg-lime-500 hover:bg-lime-800"
+      bgColor:"bg-lime-500 hover:bg-lime-800"
     },
     { label: 'Reject', 
       onClick: handleReject,
-      bg_color:"bg-red-500 hover:bg-red-800"
+      bgColor:"bg-red-500 hover:bg-red-800"
     },
   ];
 
